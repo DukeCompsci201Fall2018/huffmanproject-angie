@@ -64,7 +64,7 @@ public class HuffProcessor {
 	 * @param out
 	 *            Buffered bit stream writing to the output file.
 	 */
-	public int[] readForCounts(BitInputStream in) { //using an array because ASCII values only go up to 256
+	private int[] readForCounts(BitInputStream in) { //using an array because ASCII values only go up to 256
 		int [] counts = new int [ALPH_SIZE+1]; //ascii has 258 values
 		while(true) {
 			int val = in.readBits(BITS_PER_WORD); //returns the ascii number
@@ -78,7 +78,7 @@ public class HuffProcessor {
 		return counts;
 	}
 	
-	public HuffNode makeTreeFromCounts(int[] counts) { //Greedy algorithm consider input given, and without con
+	private HuffNode makeTreeFromCounts(int[] counts) { //Greedy algorithm consider input given, and without con
 		PriorityQueue<HuffNode> pq = new PriorityQueue<>(); //as you add it will keep it sorted according to huffnode comparable
         
 		for(int i=0; i<counts.length; i++) {
@@ -103,7 +103,7 @@ public class HuffProcessor {
 	}
 	
 	
-	public void makeCodingsFromTree(HuffNode root, String currentPath, String [] codes) { //characters stored in leafs so want path root to leaf
+	private void makeCodingsFromTree(HuffNode root, String currentPath, String [] codes) { //characters stored in leafs so want path root to leaf
 		if(root.myLeft==null && root.myRight==null) {
 			codes[root.myValue]=currentPath; //add current path to ascii value index in major codes array
 			return;
@@ -114,7 +114,7 @@ public class HuffProcessor {
 }
 	//trie is just a tree with more than 2 children
 	
-	public void writeHeader(HuffNode root, BitOutputStream out) {
+	private void writeHeader(HuffNode root, BitOutputStream out) {
 	 if(root.myLeft==null && root.myRight==null) {
 		 out.writeBits(1,1);
 		 out.writeBits(BITS_PER_WORD+1, root.myValue);
@@ -127,7 +127,7 @@ public class HuffProcessor {
 	 }
 	}
 
-	public void writeCompressedBits(String [] codings, BitInputStream in, BitOutputStream out) {
+	private void writeCompressedBits(String [] codings, BitInputStream in, BitOutputStream out) {
 		while(true) {//goes on forever, so will need something to eventually break it
 			int val = in.readBits(BITS_PER_WORD); //reaches a character
 			if(val == -1) { //you still want to write it out, and then break after that
@@ -154,7 +154,7 @@ public class HuffProcessor {
 		out.close();
 		
 		}
-	public HuffNode readTreeHeader(BitInputStream in) { //to read a single bit is in.readBits(number of bitsyou want to read)
+	private HuffNode readTreeHeader(BitInputStream in) { //to read a single bit is in.readBits(number of bitsyou want to read)
 		int value = in.readBits(1);
 		if(value== -1) {
 			throw new HuffException("Reading bits failed");
@@ -170,7 +170,7 @@ public class HuffProcessor {
 		}
 	}
 		
-	public void readCompressedBits(HuffNode root, BitInputStream in, BitOutputStream out) {
+	private void readCompressedBits(HuffNode root, BitInputStream in, BitOutputStream out) {
 		HuffNode current = root; 
 		   while (true) {
 		       int bits = in.readBits(1);
